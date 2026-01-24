@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Review
+from .models import Review,User
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -25,3 +25,8 @@ class ReveiwCreateSerializer(serializers.ModelSerializer):
             "rating",
             "level",
         ]
+
+class UserInterestBookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["interest_book"]

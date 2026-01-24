@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from .models import Review
-from .serializers import ReviewSerializer, ReveiwCreateSerializer
+from .models import Review, User
+from .serializers import ReviewSerializer, ReveiwCreateSerializer, UserInterestBookSerializer
 from .permissions import CustomReadOnly
 
 
@@ -17,3 +17,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(reviewer=self.request.user)
+
+class UserInterestBookViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserInterestBookSerializer
+    permission_classes = [CustomReadOnly]
