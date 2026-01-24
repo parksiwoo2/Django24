@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
-
+from django.contrib.auth.models import AbstractUser
 
 class Book(models.Model):
     title = models.CharField(max_length=200)
@@ -17,9 +17,7 @@ class Book(models.Model):
     rating = models.FloatField()
 
 
-class User(models.Model):
-    username = models.CharField(max_length=100)
-    password = models.CharField(max_length=100)
+class User(AbstractUser):
     nickname = models.CharField(max_length=100)
     interest_book = models.ManyToManyField(Book, related_name="interested_users")
 
@@ -47,7 +45,7 @@ class Sector(models.Model):
 
 class Comment(models.Model):
     # 1. 작성자 및 내용
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    writer = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -64,7 +62,7 @@ class Comment(models.Model):
 
 
 class BookRequest(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    requester = models.ForeignKey(User, on_delete=models.CASCADE)
     book_title = models.CharField(max_length=200)
     author = models.CharField(max_length=100)
     translator = models.CharField(max_length=100, blank=True)
