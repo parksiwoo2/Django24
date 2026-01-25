@@ -15,6 +15,8 @@ class Book(models.Model):
     cover_image = models.URLField()
     description = models.TextField()
     rating = models.FloatField()
+    difficulty = models.IntegerField(default=3) # 독서 난이도 (1-5), 책 추천을 위해 추가
+    mbti_tags = models.
 
 
 class User(models.Model):
@@ -41,8 +43,19 @@ class Review(models.Model):
 
 
 class Sector(models.Model):
+    SECTOR_TYPE = (
+        ("PAGE_ASC", "페이지 적은 순"),
+        ("PAGE_DESC", "페이지 많은 순"),
+        ("DIFFICULTY_ASC", "쉬운 책부터"),
+        ("DIFFICULTY_DESC", "어려운 책부터"),
+        ("RATING_DESC", "평점 높은 순"),
+        ("MBTI_MATCH", "MBTI 기반"),
+    )
+
     name = models.CharField(max_length=200)
-    book = models.ManyToManyField(Book, related_name="Sector")
+    type = models.CharField(max_length=30, choices=SECTOR_TYPE)
+    rule = models.JSONField(null=True, blank=True)
+    book = models.ManyToManyField(Book, related_name="Sector", blank=True)
 
 
 class Comment(models.Model):
