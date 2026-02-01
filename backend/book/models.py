@@ -38,7 +38,6 @@ class Book(models.Model):
     description = models.TextField()
     rating = models.FloatField()
     difficulty = models.IntegerField(default=3) # 독서 난이도 (1-5), 책 추천을 위해 추가
-    mbti_tags = models.
 
 
 class User(models.Model):
