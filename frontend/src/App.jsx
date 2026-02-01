@@ -1,35 +1,60 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [books, setBooks] = useState([]);
+  const [sector, setSector] = useState("");
+
+  const fetchBooks = async (sectorId) => {
+    const res = await fetch(
+      `http://localhost:8000/api/books/sector/${sectorId}/`
+    );
+    const data = await res.json();
+    setSector(data.sector);
+    setBooks(data.books);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div style={{ padding: 20 }}>
+      <h1>📚 책 추천</h1>
+
+      <div style={{ marginBottom: 20 }}>
+        <button onClick={() => fetchBooks(1)}>📄 짧게 읽기 좋은 책</button>
+        <button onClick={() => fetchBooks(2)}>📚 벽돌책</button>
+        <button onClick={() => fetchBooks(3)}>🙂 독서 입문자</button>
+        <button onClick={() => fetchBooks(4)}>🤯 어려운 책</button>
+        <button onClick={() => fetchBooks(5)}>⭐ 평점 높은 책</button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+
+      <h2>{sector}</h2>
+
+      <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+        {books.map((b) => (
+          <div
+            key={b.id}
+            style={{
+              width: 160,
+              border: "1px solid #ddd",
+              padding: 10,
+              borderRadius: 6,
+            }}
+          >
+            <img
+              src={b.cover_image}
+              alt={b.title}
+              style={{
+                width: "100%",
+                height: 220,
+                objectFit: "cover",
+              }}
+            />
+            <h4>{b.title}</h4>
+            <p>⭐ {b.rating}</p>
+            <p>{b.pages} pages</p>
+          </div>
+        ))}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
