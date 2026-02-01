@@ -1,29 +1,35 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Book, BookRequest, User
 from .serializers import BookSerializer, BookRequestSerializer
 
 @api_view(['GET'])
 def book_search(request):
-    tag = request.GET.get('tag')
+    category = request.GET.get('category') 
 
-    if not tag:
-        return Response({"error": "tag 파라미터 필요"}, status=400)
+    books = Book.objects.all()
+    if category:
+        books = books.filter(category=category)
 
-    books = Book.objects.filter(tags__icontains=tag)
     serializer = BookSerializer(books, many=True)
-
     return Response(serializer.data)
 
-@api_view(['POST'])
+
+@api_view(['GET', 'POST'])
 def create_book_request(request):
-    serializer = BookRequestSerializer(data=request.data)
 
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=201)
+    if request.method == 'GET':
+        requests = BookRequest.objects.all()
+        serializer = BookRequestSerializer(requests, many=True)
+        return Response(serializer.data)
 
-    return Response(serializer.errors, status=400)
+    elif request.method == 'POST':
+        serializer = BookRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save() 
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
