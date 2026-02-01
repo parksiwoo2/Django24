@@ -1,23 +1,36 @@
 from rest_framework import serializers
-from .models import Book
+from .models import Book, BookRequest
 
-# 도서 리스트용 Serializer
+
+class BookSerializer(serializers.ModelSerializer):
+    category_label = serializers.CharField(source="get_category_display", read_only=True)
+
+    class Meta:
+        model = Book
+        fields = "__all__"
+
 class BookListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = [
-            'id',
-            'title',
-            'autho',
-            'translator',
-            'publisher',
-            'cover_image',
-            'rating',
-            'tags'
+            "id",
+            "title",
+            "autho",   
+            "publisher",
+            "cover_image",
+            "rating",
+            "tags",
         ]
 
-# 관리자 도서 등록용 Serializer
 class BookCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        fields = "__all__" # 관리자는 모든 필드 입력 가능
+        fields = "__all__"
+
+class BookRequestSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    requested_at = serializers.DateTimeField(read_only=True)
+
+    class Meta:
+        model = BookRequest
+        fields = "__all__"

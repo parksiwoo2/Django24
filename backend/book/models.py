@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 
@@ -8,7 +9,28 @@ class Book(models.Model):
     author = models.CharField(max_length=100)
     translator = models.CharField(max_length=100, blank=True)
     publisher = models.CharField(max_length=100)
-    tags = models.CharField(max_length=200)
+    CATEGORY_CHOICES = [
+        ("fairy_tale", "동화"),
+        ("thriller", "스릴러"),
+        ("mystery", "미스터리/추리"),
+        ("romance", "로맨스"),
+        ("fantasy", "판타지"),
+        ("sf", "SF"),
+        ("essay", "에세이"),
+        ("humanities", "인문"),
+        ("self_dev", "자기계발"),
+        ("business", "경제/경영"),
+        ("it", "IT/개발"),
+        ("history", "역사"),
+        ("science", "과학"),
+        ("etc", "기타"),
+    ]
+    category = models.CharField(
+        max_length=20,
+        choices=CATEGORY_CHOICES,
+        default="etc",
+        verbose_name="태그",
+    )
     published_date = models.DateField()
     isbn = models.CharField(max_length=13)
     pages = models.IntegerField()
@@ -77,7 +99,7 @@ class Comment(models.Model):
 
 
 class BookRequest(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     book_title = models.CharField(max_length=200)
     author = models.CharField(max_length=100)
     translator = models.CharField(max_length=100, blank=True)
