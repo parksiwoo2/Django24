@@ -1,0 +1,33 @@
+<h1>📖 {{ book.title }}</h1>
+<p>작가: 
+    {% for author in book.authors.all %}
+        {{ author.name }} 
+    {% endfor %}
+</p>
+<p>현재 평점: <strong>★ {{ book.rating }}</strong></p>
+<p>{{ book.description }}</p>
+
+<hr>
+<h3>별점과 리뷰 남기기</h3>
+<form action="{% url 'rate_book' book.id %}" method="POST">
+    {% csrf_token %}
+    <label>별점: </label>
+    <select name="rating">
+        <option value="5">5점 (최고)</option>
+        <option value="4">4점</option>
+        <option value="3">3점</option>
+        <option value="2">2점</option>
+        <option value="1">1점</option>
+    </select>
+    <br>
+    <textarea name="content" placeholder="리뷰 내용" cols="50" rows="3"></textarea>
+    <br>
+    <button type="submit">등록하기</button>
+</form>
+
+<h3>다른 유저들의 리뷰</h3>
+<ul>
+    {% for review in reviews %}
+        <li>{{ review.user.username }}: {{ review.content }} (★{{ review.rating }})</li>
+    {% endfor %}
+</ul>

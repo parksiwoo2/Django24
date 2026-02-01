@@ -1,20 +1,27 @@
 from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
-
-
+from django.db.models import Avg  
 class Book(models.Model):
     title = models.CharField(max_length=200)
-    author = models.CharField(max_length=100)
-    translator = models.CharField(max_length=100, blank=True)
+    
     publisher = models.CharField(max_length=100)
-    tags = models.CharField(max_length=200)
+    tags = models.CharField(max_length=200, blank=True) 
     published_date = models.DateField()
     isbn = models.CharField(max_length=13)
     pages = models.IntegerField()
-    cover_image = models.URLField()
+    cover_image = models.URLField(blank=True)
     description = models.TextField()
-    rating = models.FloatField()
+    rating = models.FloatField(default=0.0) 
+
+    def __str__(self):
+        return self.title
+
+    def update_rating(self):
+
+        avg = self.reviews.aggregate(Avg('rating'))['rating__avg']
+        self.rating = round(avg, 1) if avg else 0.0
+        self.save()
 
 
 class User(models.Model):
@@ -22,52 +29,64 @@ class User(models.Model):
     password = models.CharField(max_length=100)
     nickname = models.CharField(max_length=100)
     interest_book = models.ManyToManyField(Book, related_name="interested_users")
-
+    
+    def __str__(self):
+        return self.nickname
 
 class Author(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
-    books = models.ManyToManyField(Book, related_name="authors")
+   
+    books = models.ManyToManyField(Book, related_name="authors") 
 
+    def __str__(self):
+        return self.name
 
 class Review(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
-    description = models.TextField()
-    posted_at = models.DateTimeField(auto_now_add=True)
-    rating = models.IntegerField()
-    level = models.IntegerField()
+   
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='reviews')
+    
+  
+  
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews_written')
+    
+    description = models.TextField() 
+    rating = models.IntegerField()   
+    level = models.IntegerField(default=1) 
+    
+  
     comment = GenericRelation("Comment", related_query_name="review")
-
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        
+        self.book.update_rating()
 
 class Sector(models.Model):
     name = models.CharField(max_length=200)
-    book = models.ManyToManyField(Book, related_name="Sector")
-
+    book = models.ManyToManyField(Book, related_name="sectors") 
 
 class Comment(models.Model):
-    # 1. 작성자 및 내용
+    
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # 2. 어떤 모델에 대한 댓글인지 설정 (Generic Relation)
+    
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")
 
-    # 3. 대댓글 구현 (자기 참조)
-    # parent가 null이면 원본 댓글, 값이 있으면 그 댓글의 대댓글입니다.
+    
     parent = models.ForeignKey(
         "self", on_delete=models.CASCADE, null=True, blank=True, related_name="replies"
     )
-
 
 class BookRequest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     book_title = models.CharField(max_length=200)
     author = models.CharField(max_length=100)
-    translator = models.CharField(max_length=100, blank=True)
     publisher = models.CharField(max_length=100)
     reason = models.TextField()
     requested_at = models.DateTimeField(auto_now_add=True)
