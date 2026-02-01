@@ -1,0 +1,12 @@
+<h2>✒️ {{ author.name }} 작가님</h2>
+<p>{{ author.description }}</p>
+<hr>
+<h3>📚 집필하신 책</h3>
+<ul>
+    {% for book in books %}
+        <li>
+            <a href="{% url 'book_detail' book.id %}">{{ book.title }}</a> 
+            (평점: ★ {{ book.rating }})
+        </li>
+    {% endfor %}
+</ul>
