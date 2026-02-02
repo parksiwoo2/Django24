@@ -1,5 +1,6 @@
 from models import Book, Sector
 
+
 def get_books_for_sector(sector: Sector):
     qs = Book.objects.all()
 
@@ -24,15 +25,16 @@ def get_books_for_sector(sector: Sector):
         if mbti:
             return qs.filter(mbti_tags__contains=[mbti])
         return qs.none()
-    
+
     return qs.none()
+
 
 def create_defualt_sectors():
     """
     서비스에 필요한 기본 섹터를 생성함
     manage.py shell에서 한 번만 실행하면 됨
     """
-    
+
     sectors = [
         ("짧게 읽기 좋은 책", "PAGE_ASC", None),
         ("벽돌책 도전", "PAGE_DESC", None),
@@ -43,8 +45,4 @@ def create_defualt_sectors():
     ]
 
     for name, type_, rule in sectors:
-        Sector.objects.get_or_create(
-            name=name,
-            type=type_,
-            defaults={"rule": rule}
-        )
+        Sector.objects.get_or_create(name=name, type=type_, defaults={"rule": rule})
