@@ -25,13 +25,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
-
-class BookSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Book
-        fields = "__all__"
-
-
 class CommentSerializer(serializers.ModelSerializer):
     content_type = serializers.CharField(write_only=True)
     writer = UserSerializer(read_only=True)
@@ -113,7 +106,7 @@ class BookListSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
-            "autho",
+            "author",
             "publisher",
             "cover_image",
             "rating",

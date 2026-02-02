@@ -10,6 +10,8 @@ import UserInfoPage from './components/UserInfoPage';
 // 도서 추천 관련 컴포넌트들
 import SectorList from "./components/SectorList";
 import BookList from "./components/BookList";
+import BookSearch from './components/BookSearch';
+import BookCard from './components/BookCard';
 
 // --- 별도의 추천 페이지 컴포넌트로 분리 ---
 function RecommendPage() {
@@ -96,6 +98,7 @@ function App() {
           <div style={styles.navLinks}>
             <Link to="/" style={styles.link}>홈</Link>
             {/* 도서 추천 링크 추가 */}
+            <Link to="/review" style={styles.link}>리뷰</Link>
             <Link to="/recommend" style={styles.link}>도서 추천</Link>
             
             {isLoggedIn ? (
@@ -116,7 +119,9 @@ function App() {
       {/* 페이지 컨텐츠 영역 */}
       <main style={{ backgroundColor: '#f9f9f9', minHeight: 'calc(100vh - 60px)', paddingTop: '20px' }}>
         <Routes>
-          <Route path="/" element={<ReviewPage />} />
+          <Route path="/" element={<BookSearch />} />
+          <Route path="/book/:id" element={<BookCard />} />
+          <Route path="/review" element={<ReviewPage />} />
           <Route path="/recommend" element={<RecommendPage />} />
           <Route path="/login" element={<LoginPage onLogin={() => setIsLoggedIn(true)} />} />
           <Route path="/register" element={<RegisterPage />} />
